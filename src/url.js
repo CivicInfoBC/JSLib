@@ -10,8 +10,6 @@ CivicInfoBC.URL.MakeQueryString=function (args) {
 	var first=true;
 	for (var key in args) {
 	
-		if (typeof args[key]==='function') continue;
-	
 		if (first) {
 		
 			retr+='?';

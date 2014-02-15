@@ -58,9 +58,7 @@ CivicInfoBC.HTTPRequest.prototype.open=function (async) {
 
 CivicInfoBC.HTTPRequest.prototype.set_headers=function () {
 
-	for (var key in this.headers)
-	if (typeof this.headers[key]!=='function')
-	this.request.setRequestHeader(
+	for (var key in this.headers) this.request.setRequestHeader(
 		key,
 		this.headers[key]
 	);
