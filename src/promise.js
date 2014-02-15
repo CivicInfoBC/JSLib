@@ -21,7 +21,11 @@ CivicInfoBC.Promise.prototype.Then=function (func) {
 	};
 	
 	if (this.completed) inner(this);
-	else this.addCallback('then',inner);
+	else CivicInfoBC.AddCallback(
+		this,
+		'then',
+		inner
+	);
 	
 	return promise;
 

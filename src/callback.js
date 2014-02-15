@@ -1,14 +1,17 @@
-if (!Object.prototype.addCallback) Object.prototype.addCallback=function (event, func) {
+if (typeof CivicInfoBC==='undefined') CivicInfoBC={};
 
-	if (typeof this[event]!=='function') {
+
+CivicInfoBC.AddCallback=function (obj, event, func) {
+
+	if (typeof obj[event]!=='function') {
 	
-		this[event]=func;
+		obj[event]=func;
 		
 	} else {
 	
-		var old=this[event];
+		var old=obj[event];
 		
-		this[event]=function () {
+		obj[event]=function () {
 		
 			old.apply(arguments);
 			
