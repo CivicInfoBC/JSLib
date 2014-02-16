@@ -1,6 +1,6 @@
 JSLib
 =====
-CivicInfo BC's base JavaScript library.
+CivicInfoBC's base JavaScript library.
 
 Notes
 -----
