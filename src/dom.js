@@ -40,7 +40,7 @@
 		function (name) {
 		
 			var regex=new RegExp(
-				'(?:^|\\s)'+RegExp.escape(name)+'(?:\\s|$)',
+				'(?:^|\\s)'+RegExp.escape(name)+'(?=\\s|$)',
 				'g'
 			);
 			
