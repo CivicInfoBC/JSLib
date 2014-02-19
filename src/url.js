@@ -29,3 +29,21 @@ CivicInfoBC.URL.MakeQueryString=function (args) {
 	return retr;
 
 };
+
+
+CivicInfoBC.URL.GetQueryString=function (qs) {
+
+	var split=qs.substr(1).split('&');
+	var obj={};
+	
+	for (var i=0;i<split.length;++i) {
+	
+		var inner=split[i].split('=');
+		
+		obj[decodeURIComponent(inner[0])]=decodeURIComponent(inner[1]) || '';
+	
+	}
+	
+	return obj;
+
+};
