@@ -4,12 +4,16 @@
 	var add=function (what, add) {
 	
 		for (var i=2;i<arguments.length;++i)
-		if (
-			(typeof arguments[i]!=='undefined') &&
-			!arguments[i].prototype[what]
-		) arguments[i].prototype[what]=add;
+		if (!(
+			(arguments[i]===null) ||
+			arguments[i].prototype[what]
+		)) arguments[i].prototype[what]=add;
 	
 	};
+	
+	var html=(typeof HTMLElement==='undefined') ? null : HTMLElement;
+	var e=(typeof Element==='undefined') ? null : Element;
+	var node=(typeof Node==='undefined') ? null : Node;
 	
 	add(
 		'hasClass',
@@ -20,8 +24,8 @@
 			return regex.test(this.className);
 		
 		},
-		Element,
-		Node
+		e,
+		node
 	);
 	
 	add(
@@ -31,8 +35,8 @@
 			if (!this.hasClass(name)) this.className+=' '+name;
 		
 		},
-		Element,
-		Node
+		e,
+		node
 	);
 	
 	add(
@@ -47,8 +51,8 @@
 			this.className=this.className.replace(regex,'');
 		
 		},
-		Element,
-		Node
+		e,
+		node
 	);
 	
 	add(
@@ -63,9 +67,9 @@
 			return retr;
 		
 		},
-		HTMLDocument,
-		Element,
-		Node
+		html,
+		e,
+		node
 	);
 
 })();
