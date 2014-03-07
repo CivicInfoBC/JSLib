@@ -53,3 +53,14 @@ CivicInfoBC.DOM.GetElementsByClassName=function (e, name) {
 	return retr;
 
 };
+
+
+CivicInfoBC.DOM.GetRadioValue=function (e) {
+
+	if (typeof e.length==='undefined') return e.checked ? e.value : null;
+	
+	for (var i=0;i<e.length;++i) if (e[i].checked) return e[i].value;
+	
+	return null;
+
+};
