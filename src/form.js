@@ -239,7 +239,8 @@ CivicInfoBC.Form.prototype.process_element=function (element, radios) {
 		
 		if (
 			(type==='TEXT') ||
-			(type==='EMAIL')
+			(type==='EMAIL') ||
+			(type==='PASSWORD')
 		) return this.process_text(element);
 		
 		if (type==='RADIO') {
