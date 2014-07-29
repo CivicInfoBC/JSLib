@@ -38,7 +38,7 @@ CivicInfoBC.Form.prototype.evaluate_condition=function (element, name) {
 	if (str===null) return null;
 
 	var conds=str.split(' ');
-	var retr=null;
+	var retr=true;
 	for (var i=0;i<conds.length;++i) {
 	
 		var cond=conds[i].trim();
@@ -47,10 +47,7 @@ CivicInfoBC.Form.prototype.evaluate_condition=function (element, name) {
 		
 		if (typeof this[cond]!=='function') continue;
 		
-		var r=this[cond](element);
-		
-		if (r) return true;
-		else retr=false;
+		if (!this[cond](element)) retr=false;
 	
 	}
 	
@@ -59,18 +56,10 @@ CivicInfoBC.Form.prototype.evaluate_condition=function (element, name) {
 };
 
 
-CivicInfoBC.Form.prototype.is_conditionally_mandatory_impl=function (element) {
-
-	return this.evaluate_condition(element,'data-mandatory-if');
-
-}
-
-
 //	Determines if an element is conditionally mandatory
 CivicInfoBC.Form.prototype.is_conditionally_mandatory=function (element) {
 
-	var retr=this.is_conditionally_mandatory_impl(element);
-	return (retr===null) ? false : retr;
+	return this.evaluate_condition(element,'data-mandatory-if');
 
 };
 
@@ -78,13 +67,13 @@ CivicInfoBC.Form.prototype.is_conditionally_mandatory=function (element) {
 //	Determines if an element is mandatory
 CivicInfoBC.Form.prototype.is_mandatory=function (element) {
 
-	return element.hasAttribute('data-mandatory');
+	return element.hasAttribute('data-mandatory') ? true : null;
 
 };
 
 
-//	Implementation of executing a custom callback
-CivicInfoBC.Form.prototype.execute_custom_impl=function (element, name) {
+//	Executes a custom callback if specified
+CivicInfoBC.Form.prototype.execute_custom=function (element, name) {
 
 	var callback=this.get_attribute(element,name);
 	if (
@@ -97,24 +86,8 @@ CivicInfoBC.Form.prototype.execute_custom_impl=function (element, name) {
 };
 
 
-//	Converts null values to true
-CivicInfoBC.Form.prototype.true_if_null=function (val) {
-
-	return (val===null) ? true : val;
-
-};
-
-
-//	Executes a custom callback if specified
-CivicInfoBC.Form.prototype.execute_custom=function (element) {
-
-	return this.true_if_null(this.execute_custom_impl(element,'data-callback'));
-
-};
-
-
-//	Implementation of checking a regex
-CivicInfoBC.Form.prototype.check_regex_impl=function (element, name) {
+//	Checks a regex if specified
+CivicInfoBC.Form.prototype.check_regex=function (element, name) {
 
 	var pattern=this.get_attribute(element,name);
 	if (pattern===null) return null;
@@ -129,38 +102,26 @@ CivicInfoBC.Form.prototype.check_regex_impl=function (element, name) {
 };
 
 
-//	Checks a regex if specified
-CivicInfoBC.Form.prototype.check_regex=function (element) {
-
-	return this.true_if_null(this.check_regex_impl(element,'data-regex'));
-
-};
-
-
 //	Processes a text field
 CivicInfoBC.Form.prototype.process_text=function (element) {
 
-	//	Is this field mandatory?
-	//
-	//	If so, make sure it has contents
-	if (
-		(
-			this.is_mandatory(element) ||
-			this.is_conditionally_mandatory(element)
-		) &&
-		(element.value.trim()==='')
-	) return false;
+	var retr=null;
+	
+	var is_mandatory=this.is_mandatory(element);
+	var is_conditionally_mandatory=this.is_conditionally_mandatory(element);
+	if ((is_mandatory || is_conditionally_mandatory) && (element.value.trim()==='')) return false;
+	if (!((is_mandatory===null) && (is_conditionally_mandatory===null))) retr=true;
 	
 	//	Execute custom validation callback if
 	//	appropriate
-	if (!this.execute_custom(element)) return false;
+	if (this.execute_custom(element)===false) return false;
 	
 	//	If this element has a regex handler,
 	//	invoke that
-	if (!this.check_regex(element)) return false;
+	if (this.check_regex(element)===false) return false;
 	
 	//	Nothing failed, so this element is good
-	return true;
+	return retr;
 
 };
 
@@ -170,23 +131,22 @@ CivicInfoBC.Form.prototype.is_radio_valid=function (element) {
 
 	//	Unconditionally invalid
 	if (element.hasAttribute('data-invalid')) return false;
-
-	//	Conditionally valid
-	if (
-		(this.evaluate_condition(element,'data-valid-if')===false) ||
-		(this.evaluate_condition(element,'data-invalid-if')===true)
-	) return false;
 	
-	return true;
+	var valid=this.evaluate_condition(element,'data-valid-if');
+	var invalid=this.evaluate_condition(element,'data-invalid-if');
+	if ((valid===false) || (invalid===true)) return false;
+	if ((valid===true) || (invalid===false)) return true;
+	
+	return null;
 
 };
 
 
 CivicInfoBC.Form.prototype.process_radio=function (element) {
 
-	if (this.is_conditionally_mandatory_impl(element)===false) return true;
+	if (this.is_conditionally_mandatory(element)===false) return true;
 	
-	if (!this.is_radio_valid(element)) return false;
+	if (this.is_radio_valid(element)===false) return false;
 	
 	return element.checked;
 
@@ -211,15 +171,15 @@ CivicInfoBC.Form.prototype.process_select=function (element) {
 
 	var value=element.options[element.selectedIndex].value;
 	
-	if (
-		(
-			this.is_mandatory(element) ||
-			this.is_conditionally_mandatory(element)
-		) &&
-		(value==='')
-	) return false;
+	var is_mandatory=this.is_mandatory(element);
+	var is_conditionally_mandatory=this.is_conditionally_mandatory(element);
+	if ((is_mandatory || is_conditionally_mandatory) && (value==='')) return false;
+	var retr=null;
+	if (!((is_mandatory===null) && (is_conditionally_mandatory===null))) retr=true;
 	
-	return this.execute_custom(element);
+	if (this.execute_custom(element)===false) retr=false;
+	
+	return retr;
 
 };
 
