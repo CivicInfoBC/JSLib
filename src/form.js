@@ -268,10 +268,6 @@ CivicInfoBC.Form.prototype.process_element=function (element, radios) {
 				return this.process_radios(this.Get(name));
 				
 			}
-			
-			//	If we've already processed this group, errors will
-			//	be caught there
-			return null;
 		
 		}
 	
@@ -285,8 +281,9 @@ CivicInfoBC.Form.prototype.process_element=function (element, radios) {
 	
 	}
 	
-	//	Fallback to true
-	return true;
+	//	If we don't know how to validate this
+	//	tag, return neutral
+	return null;
 
 };
 
