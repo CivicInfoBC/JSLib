@@ -157,7 +157,19 @@ CivicInfoBC.Form.prototype.process_radio=function (element) {
 //	button
 CivicInfoBC.Form.prototype.process_radios=function (elements) {
 
-	if (typeof elements.length==='undefined') return this.process_radio(elements);
+	if (typeof elements.length==='undefined') {
+	
+		if (elements.hasAttribute('checked')) return null;
+		
+		return this.process_radio(elements);
+	
+	}
+	
+	//	If one of the radio buttons started out selected, there's
+	//	no way to ever not have one selected, and therefore these
+	//	checks will just generate spurious callback invocations which
+	//	may not be desired
+	for (var i=0;i<elements.length;++i) if (elements[i].hasAttribute('checked')) return null;
 
 	for (var i=0;i<elements.length;++i) if (this.process_radio(elements[i])) return true;
 	
@@ -210,9 +222,9 @@ CivicInfoBC.Form.prototype.process_element=function (element, radios) {
 			var name=this.get_attribute(element,'name');
 			//	If this radio button doesn't have a name, it's
 			//	not part of a group.  This is probably an error
-			//	on the part of the form designer, but do the only
-			//	sensible thing -- validate only if it's checked
-			if (name===null) return element.checked;
+			//	on the part of the form designer, so ignore
+			//	it
+			if (name===null) return null;
 			//	Check to see if we've already checked a radio
 			//	button with this name (and thus the whole group
 			//	of radio buttons)
